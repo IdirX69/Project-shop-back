@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Définition du modèle pour les utilisateurs
+model User {
+  id                  Int     @id @default(autoincrement())
+  email               String  @unique
+  password            String
+  firstname           String
+  lastname            String
+  address             String
+  isResettingPassword Boolean @default(false)
+  resetPasswordToken  String? @unique
+  orders              Order[]
+}
+
+// Définition du modèle pour les produits
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  image       String
+  categories  Category[]
+  OrderItem   OrderItem[]
+}
+
+// Définition du modèle pour les catégories de produits
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+// Définition du modèle pour les commandes
+model Order {
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  total     Float
+  status    String
+  items     OrderItem[]
+  user      User?       @relation(fields: [userId], references: [id])
+  userId    Int?
+}
+
+// Définition du modèle pour les articles de commande
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   Int
+}
