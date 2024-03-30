@@ -1,6 +1,6 @@
 // product.dto.ts
 
-import { IsString, IsNumber, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsArray } from 'class-validator';
 
 export class CreateArticleDto {
   @IsString()
@@ -10,8 +10,8 @@ export class CreateArticleDto {
   @IsOptional()
   readonly description?: string;
 
-  @IsNumber()
-  readonly price: number;
+  @IsString()
+  readonly price: string; // Mettre à jour le type de prix en nombre
 
   @IsString()
   readonly image: string;
