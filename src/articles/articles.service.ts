@@ -6,14 +6,18 @@ import { PrismaService } from '../users/prisma.service';
 @Injectable()
 export class ArticlesService {
   constructor(private readonly prisma: PrismaService) {}
-  create(createArticleDto: CreateArticleDto) {
-    console.log('dto' + createArticleDto);
+  async create({ articleBody }: { articleBody: CreateArticleDto }) {
+    try {
+      const { name, price, description, image } = articleBody;
+      console.log('dto' + price);
 
-    const { name, price, description, image } = createArticleDto;
-
-    return this.prisma.product.create({
-      data: { name, description, price: 2, image },
-    });
+      const createdArticle = await this.prisma.product.create({
+        data: { name, description, price: parseInt(price), image },
+      });
+      return createdArticle;
+    } catch (error) {
+      return { error: true, message: error.message };
+    }
   }
 
   findAll() {
