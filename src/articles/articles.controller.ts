@@ -20,47 +20,35 @@ import { extname } from 'path';
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
-    }),
-  )
-  @Post()
-  async create(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() articleBody: CreateArticleDto,
-  ) {
-    try {
-      if (!file) {
-        throw new Error('No image uploaded');
-      }
+  @Post('post')
+  async create(@Body() articleBody: CreateArticleDto) {
+    console.log('rerze');
 
-      const fileName = file.filename;
-      const articleData = { ...articleBody, image: fileName };
-      const createdArticle = await this.articlesService.create({
-        articleBody: articleData,
-      });
-
-      return {
-        success: true,
-        article: createdArticle,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
+    return await this.articlesService.createArticle({ articleBody });
   }
+  // @UseInterceptors(
+  //   FileInterceptor('image', {
+  //     storage: diskStorage({
+  //       destination: './uploads',
+  //       filename: (req, file, cb) => {
+  //         const randomName = Array(32)
+  //           .fill(null)
+  //           .map(() => Math.round(Math.random() * 16).toString(16))
+  //           .join('');
+  //         cb(null, `${randomName}${extname(file.originalname)}`);
+  //       },
+  //     }),
+  //   }),
+  // )
+  // async uploadedFile(@UploadedFile() file) {
+  //   const response = {
+  //     originalname: file.originalname,
+  //     filename: file.filename,
+  //   };
+  //   console.log(response);
+
+  //   return response;
+  // }
   @Get()
   findAll() {
     return this.articlesService.findAll();
