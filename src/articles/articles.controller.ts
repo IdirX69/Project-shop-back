@@ -20,35 +20,32 @@ import { extname } from 'path';
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
-  @Post('post')
-  async create(@Body() articleBody: CreateArticleDto) {
-    console.log('rerze');
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  async create(
+    @Body() createArticleDto: CreateArticleDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log('ok');
+    // Assuming you want to store the file path in the database
+    createArticleDto.image = file.path;
+    console.log('file');
 
-    return await this.articlesService.createArticle({ articleBody });
+    return await this.articlesService.createArticle(createArticleDto);
   }
-  // @UseInterceptors(
-  //   FileInterceptor('image', {
-  //     storage: diskStorage({
-  //       destination: './uploads',
-  //       filename: (req, file, cb) => {
-  //         const randomName = Array(32)
-  //           .fill(null)
-  //           .map(() => Math.round(Math.random() * 16).toString(16))
-  //           .join('');
-  //         cb(null, `${randomName}${extname(file.originalname)}`);
-  //       },
-  //     }),
-  //   }),
-  // )
-  // async uploadedFile(@UploadedFile() file) {
-  //   const response = {
-  //     originalname: file.originalname,
-  //     filename: file.filename,
-  //   };
-  //   console.log(response);
 
-  //   return response;
-  // }
   @Get()
   findAll() {
     return this.articlesService.findAll();

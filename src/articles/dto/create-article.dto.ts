@@ -14,7 +14,7 @@ export class CreateArticleDto {
   readonly price: string; // Mettre à jour le type de prix en nombre
 
   @IsString()
-  readonly image: string;
+  image: string;
 
   @IsArray()
   @IsOptional()

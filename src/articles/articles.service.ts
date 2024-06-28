@@ -1,10 +1,7 @@
-import { Injectable, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { PrismaService } from '../articles/prisma.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 @Injectable()
 export class ArticlesService {
