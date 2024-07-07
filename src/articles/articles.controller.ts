@@ -10,13 +10,16 @@ import {
   UploadedFile,
   UsePipes,
   ValidationPipe,
+  Res,
+  StreamableFile,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { createReadStream } from 'fs';
 
 @Controller('articles')
 export class ArticlesController {
@@ -49,6 +52,12 @@ export class ArticlesController {
     // Log the incoming DTO
     console.log('Received DTO in controller:', createArticleDto);
     return this.articlesService.create(createArticleDto);
+  }
+
+  @Get('file')
+  getFile(): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    return new StreamableFile(file);
   }
 
   @Get()
