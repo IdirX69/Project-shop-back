@@ -8,6 +8,8 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -20,30 +22,33 @@ import { extname } from 'path';
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
-  @Post()
+  @Post('upload')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads', // Le dossier où les fichiers seront sauvegardés
         filename: (req, file, callback) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+          const filename = `${file.fieldname}-${uniqueSuffix}${ext}`;
+          callback(null, filename);
         },
       }),
     }),
   )
-  async create(
-    @Body() createArticleDto: CreateArticleDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    console.log('ok');
-    // Assuming you want to store the file path in the database
-    createArticleDto.image = file.path;
-    console.log('file');
+  async create(@UploadedFile() file: Express.Multer.File) {
+    return {
+      filename: file.filename,
+    };
+  }
 
-    return await this.articlesService.createArticle(createArticleDto);
+  @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
+  createArticle(@Body() createArticleDto: CreateArticleDto) {
+    // Log the incoming DTO
+    console.log('Received DTO in controller:', createArticleDto);
+    return this.articlesService.create(createArticleDto);
   }
 
   @Get()
