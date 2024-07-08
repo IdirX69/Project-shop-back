@@ -53,8 +53,9 @@ export class ArticlesService {
     }
   }
 
-  findAll() {
-    return `This action returns all articles`;
+  async findAll() {
+    const products = await this.prisma.product.findMany({});
+    return products;
   }
 
   findOne(id: number) {
