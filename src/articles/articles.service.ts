@@ -58,12 +58,25 @@ export class ArticlesService {
     return products;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} article`;
+  async findOne(id: number) {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return product;
   }
 
-  update(id: number, updateArticleDto: UpdateArticleDto) {
-    return `This action updates a #${id} article`;
+  async update(id: number, articleBody: UpdateArticleDto) {
+    console.log('articleBody', articleBody);
+
+    const { name, description, price, image } = articleBody;
+
+    const product = await this.prisma.product.update({
+      where: { id: id },
+      data: { name, description, price: parseFloat(price), image },
+    });
+    return product;
   }
 
   remove(id: number) {
