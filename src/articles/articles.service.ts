@@ -79,7 +79,12 @@ export class ArticlesService {
     return product;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} article`;
+  async remove(id: number) {
+    const product = await this.prisma.product.delete({
+      where: {
+        id: id,
+      },
+    });
+    return product;
   }
 }

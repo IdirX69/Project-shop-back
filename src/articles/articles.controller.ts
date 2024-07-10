@@ -12,6 +12,7 @@ import {
   ValidationPipe,
   Res,
   StreamableFile,
+  UseGuards,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
@@ -20,6 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { createReadStream } from 'fs';
+import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 
 @Controller('articles')
 export class ArticlesController {
