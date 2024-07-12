@@ -1,22 +1,20 @@
-// product.dto.ts
-
-import { IsString, IsOptional, IsArray } from 'class-validator';
+// create-article.dto.ts
+import { IsNotEmpty, IsString, IsNumberString } from 'class-validator';
 
 export class CreateArticleDto {
+  @IsNotEmpty()
   @IsString()
-  readonly name: string;
+  name: string;
 
+  @IsNotEmpty()
   @IsString()
-  @IsOptional()
-  readonly description?: string;
+  description: string;
 
+  @IsNotEmpty()
+  @IsNumberString()
+  price: string;
+
+  @IsNotEmpty()
   @IsString()
-  readonly price: string; // Mettre à jour le type de prix en nombre
-
-  @IsString()
-  readonly image: string;
-
-  @IsArray()
-  @IsOptional()
-  readonly categoryIds?: number[];
+  image: string;
 }

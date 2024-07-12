@@ -12,7 +12,7 @@ import { MailerService } from 'src/users/mailer.service';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '11111111111160s' },
     }),
   ],
   controllers: [AuthController],

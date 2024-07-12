@@ -8,47 +8,60 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  UsePipes,
+  ValidationPipe,
+  Res,
+  StreamableFile,
+  UseGuards,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { createReadStream } from 'fs';
+import { JwtAuthGuard } from 'src/auth/jwt.auth.guard';
 
 @Controller('articles')
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
-  @Post('post')
-  async create(@Body() articleBody: CreateArticleDto) {
-    console.log('rerze');
-
-    return await this.articlesService.createArticle({ articleBody });
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads', // Le dossier où les fichiers seront sauvegardés
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${file.fieldname}-${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
+  async create(@UploadedFile() file: Express.Multer.File) {
+    return {
+      filename: file.filename,
+    };
   }
-  // @UseInterceptors(
-  //   FileInterceptor('image', {
-  //     storage: diskStorage({
-  //       destination: './uploads',
-  //       filename: (req, file, cb) => {
-  //         const randomName = Array(32)
-  //           .fill(null)
-  //           .map(() => Math.round(Math.random() * 16).toString(16))
-  //           .join('');
-  //         cb(null, `${randomName}${extname(file.originalname)}`);
-  //       },
-  //     }),
-  //   }),
-  // )
-  // async uploadedFile(@UploadedFile() file) {
-  //   const response = {
-  //     originalname: file.originalname,
-  //     filename: file.filename,
-  //   };
-  //   console.log(response);
 
-  //   return response;
-  // }
+  @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
+  createArticle(@Body() createArticleDto: CreateArticleDto) {
+    // Log the incoming DTO
+    console.log('Received DTO in controller:', createArticleDto);
+    return this.articlesService.create(createArticleDto);
+  }
+
+  @Get('file')
+  getFile(): StreamableFile {
+    const file = createReadStream(join(process.cwd(), 'package.json'));
+    return new StreamableFile(file);
+  }
+
   @Get()
   findAll() {
     return this.articlesService.findAll();
