@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { PrismaService } from './prisma.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ArticlesService {
@@ -86,6 +88,9 @@ export class ArticlesService {
       where: {
         id: id,
       },
+      include: {
+        categories: true,
+      },
     });
     return product;
   }
@@ -103,11 +108,36 @@ export class ArticlesService {
   }
 
   async remove(id: number) {
-    const product = await this.prisma.product.delete({
+    // Obtenir l'article et son image associée
+    const product = await this.prisma.product.findUnique({
       where: {
         id: id,
       },
     });
-    return product;
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    const imagePath = path.join('uploads', product.image);
+    console.log(imagePath);
+
+    try {
+      // Supprimer l'image du système de fichiers
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+
+      // Supprimer le produit de la base de données
+      const deletedProduct = await this.prisma.product.delete({
+        where: {
+          id: id,
+        },
+      });
+
+      return deletedProduct;
+    } catch (error) {
+      return { error: true, message: error.message };
+    }
   }
 }
