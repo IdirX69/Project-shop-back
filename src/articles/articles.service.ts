@@ -9,13 +9,14 @@ export class ArticlesService {
 
   async create(articleBody: CreateArticleDto) {
     try {
-      const { name, price, description, image } = articleBody;
+      const { name, price, description, categories, image } = articleBody;
 
       // Log received data for debugging
       console.log('Received article data in service:', {
         name,
         price,
         description,
+        categories,
         image,
       });
 
@@ -38,12 +39,30 @@ export class ArticlesService {
         throw new Error('Price must be a valid number');
       }
 
+      // Validate categories
+      const categoryIds = categories.map((catId) => parseInt(catId));
+      const validCategories = await this.prisma.category.findMany({
+        where: {
+          id: { in: categoryIds },
+        },
+      });
+
+      if (validCategories.length !== categoryIds.length) {
+        throw new Error('One or more categories are invalid');
+      }
+
       const createdArticle = await this.prisma.product.create({
         data: {
           name,
           description,
           price: parseFloat(price),
+          categories: {
+            connect: categoryIds.map((id) => ({ id })),
+          },
           image,
+        },
+        include: {
+          categories: true,
         },
       });
 
@@ -54,7 +73,11 @@ export class ArticlesService {
   }
 
   async findAll() {
-    const products = await this.prisma.product.findMany({});
+    const products = await this.prisma.product.findMany({
+      include: {
+        categories: true,
+      },
+    });
     return products;
   }
 
