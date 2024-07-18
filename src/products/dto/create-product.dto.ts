@@ -1,7 +1,7 @@
-// create-article.dto.ts
+// create-product.dto.ts
 import { IsNotEmpty, IsString, IsNumberString } from 'class-validator';
 
-export class CreateArticleDto {
+export class CreateProductDto {
   @IsNotEmpty()
   @IsString()
   name: string;

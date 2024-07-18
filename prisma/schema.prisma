@@ -50,7 +50,7 @@ model Order {
   userId    Int?
 }
 
-// Définition du modèle pour les articles de commande
+// Définition du modèle pour les products de commande
 model OrderItem {
   id        Int     @id @default(autoincrement())
   quantity  Int

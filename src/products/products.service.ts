@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { CreateArticleDto } from './dto/create-article.dto';
-import { UpdateArticleDto } from './dto/update-article.dto';
+
 import { PrismaService } from './prisma.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
-export class ArticlesService {
+export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(articleBody: CreateArticleDto) {
-    console.log('articleBody', articleBody);
+  async create(productBody: CreateProductDto) {
+    console.log('productBody', productBody);
 
     try {
-      const { name, price, description, categoryId, image } = articleBody;
+      const { name, price, description, categoryId, image } = productBody;
 
       // Log received data for debugging
-      console.log('Received article data in service:', {
+      console.log('Received product data in service:', {
         name,
         price,
         description,
@@ -75,10 +76,10 @@ export class ArticlesService {
     return product;
   }
 
-  async update(id: number, articleBody: UpdateArticleDto) {
-    console.log('articleBody', articleBody);
+  async update(id: number, productBody: UpdateProductDto) {
+    console.log('productBody', productBody);
 
-    const { name, description, price, categoryId, image } = articleBody;
+    const { name, description, price, categoryId, image } = productBody;
 
     const product = await this.prisma.product.update({
       where: { id: id },
@@ -94,7 +95,7 @@ export class ArticlesService {
   }
 
   async remove(id: number) {
-    // Obtenir l'article et son image associée
+    // Obtenir l'product et son image associée
     const product = await this.prisma.product.findUnique({
       where: {
         id: id,
