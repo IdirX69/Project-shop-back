@@ -15,7 +15,7 @@ export class CreateArticleDto {
   price: string;
 
   @IsNotEmpty()
-  categories: [string];
+  categoryId: string;
 
   @IsNotEmpty()
   @IsString()

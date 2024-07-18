@@ -10,15 +10,17 @@ export class ArticlesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(articleBody: CreateArticleDto) {
+    console.log('articleBody', articleBody);
+
     try {
-      const { name, price, description, categories, image } = articleBody;
+      const { name, price, description, categoryId, image } = articleBody;
 
       // Log received data for debugging
       console.log('Received article data in service:', {
         name,
         price,
         description,
-        categories,
+        categoryId,
         image,
       });
 
@@ -41,30 +43,13 @@ export class ArticlesService {
         throw new Error('Price must be a valid number');
       }
 
-      // Validate categories
-      const categoryIds = categories.map((catId) => parseInt(catId));
-      const validCategories = await this.prisma.category.findMany({
-        where: {
-          id: { in: categoryIds },
-        },
-      });
-
-      if (validCategories.length !== categoryIds.length) {
-        throw new Error('One or more categories are invalid');
-      }
-
       const createdArticle = await this.prisma.product.create({
         data: {
-          name,
-          description,
-          price: parseFloat(price),
-          categories: {
-            connect: categoryIds.map((id) => ({ id })),
-          },
-          image,
-        },
-        include: {
-          categories: true,
+          name: name,
+          description: description,
+          price: parseInt(price),
+          categoryId: parseInt(categoryId),
+          image: image,
         },
       });
 
@@ -76,9 +61,7 @@ export class ArticlesService {
 
   async findAll() {
     const products = await this.prisma.product.findMany({
-      include: {
-        categories: true,
-      },
+      include: { category: true },
     });
     return products;
   }
@@ -88,9 +71,6 @@ export class ArticlesService {
       where: {
         id: id,
       },
-      include: {
-        categories: true,
-      },
     });
     return product;
   }
@@ -98,11 +78,17 @@ export class ArticlesService {
   async update(id: number, articleBody: UpdateArticleDto) {
     console.log('articleBody', articleBody);
 
-    const { name, description, price, image } = articleBody;
+    const { name, description, price, categoryId, image } = articleBody;
 
     const product = await this.prisma.product.update({
       where: { id: id },
-      data: { name, description, price: parseFloat(price), image },
+      data: {
+        name,
+        description,
+        price: parseFloat(price),
+        categoryId: parseInt(categoryId),
+        image,
+      },
     });
     return product;
   }
