@@ -5,9 +5,10 @@ import { JwtService } from '@nestjs/jwt';
 import { UserPayload } from './jwt.strategy';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LogUserDto } from 'src/users/dto/login-user.dto';
-import { MailerService } from 'src/users/mailer.service';
+
 import { createId } from '@paralleldrive/cuid2';
 import { ResetUserPasswordDto } from 'src/users/dto/reset-user-password';
+import { MailerService } from 'src/users/mailer.service';
 
 @Injectable()
 export class AuthService {

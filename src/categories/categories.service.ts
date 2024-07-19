@@ -1,15 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { PrismaService } from 'src/users/prisma.service';
 
 @Injectable()
 export class CategoriesService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(categoryBody: CreateCategoryDto) {
+    try {
+      const { name } = categoryBody;
+
+      // Log received data for debugging
+      console.log('Received category data in service:', {
+        name,
+      });
+
+      if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        throw new Error('Name is required and must be a non-empty string');
+      }
+
+      const createdCategory = await this.prisma.category.create({
+        data: {
+          name,
+        },
+      });
+
+      return createdCategory;
+    } catch (error) {
+      return { error: true, message: error.message };
+    }
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async findAll() {
+    const categories = await this.prisma.category.findMany();
+    return categories;
   }
 
   findOne(id: number) {
@@ -20,7 +45,11 @@ export class CategoriesService {
     return `This action updates a #${id} category`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: number) {
+    const deletedCategory = await this.prisma.category.delete({
+      where: { id: id },
+    });
+
+    return `This action removes a #${deletedCategory.name} category`;
   }
 }
