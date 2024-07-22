@@ -41,8 +41,14 @@ export class CategoriesService {
     return `This action returns a #${id} category`;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const { name } = updateCategoryDto;
+    const editedCategory = await this.prisma.category.update({
+      where: { id: id },
+      data: { name },
+    });
+
+    return editedCategory;
   }
 
   async remove(id: number) {
