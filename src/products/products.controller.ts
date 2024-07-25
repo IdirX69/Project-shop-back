@@ -51,8 +51,6 @@ export class ProductsController {
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
   createArticle(@Body() createProductDto: CreateProductDto) {
-    // Log the incoming DTO
-    console.log('Received DTO in controller:', createProductDto);
     return this.productsService.create(createProductDto);
   }
 
