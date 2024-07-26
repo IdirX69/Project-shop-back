@@ -15,7 +15,7 @@ model User {
   firstname           String
   lastname            String
   address             String
-  roles               String  @default("admin")
+  roles               String  @default("user")
   isResettingPassword Boolean @default(false)
   resetPasswordToken  String? @unique
   orders              Order[]
