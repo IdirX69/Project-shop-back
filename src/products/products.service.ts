@@ -86,7 +86,7 @@ export class ProductsService {
       data: {
         name,
         description,
-        price: parseFloat(price),
+        price: parseInt(price),
         categoryId: parseInt(categoryId),
         image,
       },
