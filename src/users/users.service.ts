@@ -25,8 +25,12 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const { firstname, lastname, email, address } = updateUserDto;
+    const updatedUser = await this.prisma.user.update({
+      where: { id: id },
+      data: { firstname, lastname, email, address },
+    });
   }
 
   remove(id: number) {

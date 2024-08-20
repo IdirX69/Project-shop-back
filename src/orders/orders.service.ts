@@ -42,16 +42,50 @@ export class OrdersService {
     return order;
   }
 
-  async getOrderById(id: number): Promise<Order | null> {
-    return this.prisma.order.findUnique({
-      where: { id },
+  async getOrders(): Promise<Order[]> {
+    return this.prisma.order.findMany({
+      include: {
+        user: {
+          select: {
+            firstname: true,
+            email: true,
+            address: true,
+          },
+        },
+        items: {
+          select: {
+            quantity: true,
+            product: {
+              select: {
+                name: true,
+                price: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
-  async getOrders(): Promise<Order[]> {
-    return this.prisma.order.findMany();
+  async getOrderById(id: number): Promise<Order | null> {
+    return this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            firstname: true,
+            email: true,
+            address: true,
+          },
+        },
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
   }
-
   async updateOrder(id: number, data: Prisma.OrderUpdateInput): Promise<Order> {
     return this.prisma.order.update({
       where: { id },
