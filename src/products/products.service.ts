@@ -79,7 +79,16 @@ export class ProductsService {
   async update(id: number, productBody: UpdateProductDto) {
     console.log('productBody', productBody);
 
+    const productToUpdate = await this.prisma.product.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    const imagePath = path.join('uploads', productToUpdate.image);
+
     const { name, description, price, categoryId, image } = productBody;
+
+    if (image !== productToUpdate.image) fs.unlinkSync(imagePath);
 
     const product = await this.prisma.product.update({
       where: { id: id },
@@ -107,21 +116,17 @@ export class ProductsService {
     }
 
     const imagePath = path.join('uploads', product.image);
-    console.log(imagePath);
+    console.log(product);
 
     try {
-      // Supprimer l'image du système de fichiers
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-
-      // Supprimer le produit de la base de données
       const deletedProduct = await this.prisma.product.delete({
         where: {
           id: id,
         },
       });
+      fs.unlinkSync(imagePath);
 
+      console.log('delete' + deletedProduct);
       return deletedProduct;
     } catch (error) {
       return { error: true, message: error.message };
