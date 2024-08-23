@@ -10,6 +10,8 @@ export class CreateUserDto {
   firstname: string;
   @IsString({ message: 'Indiquez votre nom et prénom' })
   lastname: string;
+
+  roles: string;
   @IsString({ message: 'Indiquez votre adresse postale' })
   address: string;
 }
